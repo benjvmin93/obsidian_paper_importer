@@ -101,11 +101,29 @@ export class ImportModal extends Modal {
 		const notePath = normalizePath(
 			`${noteFolderPath.path}/${noteFilename}`
 		);
+
+		const authors = paper.authors.map(author => {
+			return `- ${author}`;
+		}).join("\n");
+
+		const match = paper.date.match("[0-9]{4}-[0-9]{2}-[0-9]{2}");
+		let year = "";
+		let md = "";
+		if (match != null) {
+			const date = new Date(match[0]);
+			year = date.getFullYear().toString();
+			md = date.getMonth().toString() + "." + date.getDay().toString();
+		} else {
+			year = paper.date;
+			md = paper.date;
+		}
+
 		const noteContent = noteTemplate
 			.replace(/{{\s*paper_id\s*}}/g, paper.paperId)
 			.replace(/{{\s*title\s*}}/g, `"${paper.title}"`)
-			.replace(/{{\s*authors\s*}}/g, paper.authors.join(", "))
-			.replace(/{{\s*date\s*}}/g, paper.date)
+			.replace(/{{\s*authors\s*}}/g, `\n${authors}`)
+			.replace(/{{\s*year\s*}}/g, year)
+			.replace(/{{\s*date\s*}}/g, md)
 			.replace(/{{\s*abstract\s*}}/g, `"${paper.abstract}"`)
 			.replace(/{{\s*comments\s*}}/g, `"${paper.comments}"`)
 			.replace(/{{\s*pdf_link\s*}}/g, `"[[${pdfPath}]]"`);
